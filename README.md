@@ -121,7 +121,7 @@ The Streamlit web application allows users to:
 ---
 
 ## 📂 Project Structure
-
+```
 News-Article-Classification-Fake-vs-Real/
 │
 ├── app.py # Streamlit application
@@ -134,5 +134,5 @@ News-Article-Classification-Fake-vs-Real/
 ├── News_Article_Classification_Fake_vs_Real_Report
 ├── README.md
 ├── notebook.ipynb
-
+```
 ---
