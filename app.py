@@ -6,6 +6,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import shap
+import nltk
+
+# ---------------- FIX NLTK FOR STREAMLIT ----------------
+@st.cache_resource
+def load_nltk():
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
+
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+
+load_nltk()
+
 from nltk.corpus import stopwords
 
 # ---------------- PAGE CONFIG ----------------
@@ -16,13 +33,18 @@ st.set_page_config(
 )
 
 # ---------------- LOAD MODEL ----------------
-model = pickle.load(open("model.pkl", "rb"))
-vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+@st.cache_resource
+def load_model():
+    model = pickle.load(open("model.pkl", "rb"))
+    vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+    return model, vectorizer
+
+model, vectorizer = load_model()
 
 stop_words = set(stopwords.words('english'))
 feature_names = vectorizer.get_feature_names_out()
 
-# SHAP Explainer (for Logistic Regression)
+# SHAP Explainer
 explainer = shap.LinearExplainer(model, vectorizer.transform(["sample"]))
 
 # ---------------- CLEAN FUNCTION ----------------
@@ -66,14 +88,12 @@ if st.button("🔎 Analyze Article"):
         else:
             st.error("❌ Final Prediction: FAKE News")
 
-    # ---------------- COLOR-CODED BAR ----------------
+    # ---------------- BAR GRAPH ----------------
     with col2:
         st.subheader("📈 Probability Distribution")
 
         fig, ax = plt.subplots()
-
-        colors = ["red", "green"]
-        ax.bar(["Fake", "Real"], probability, color=colors)
+        ax.bar(["Fake", "Real"], probability)
         ax.set_ylim([0, 1])
         ax.set_ylabel("Probability")
 
@@ -100,9 +120,9 @@ if st.button("🔎 Analyze Article"):
         lambda x: "REAL" if x > 0 else "FAKE"
     )
 
-    st.dataframe(explanation_df, use_container_width=True)
+    st.dataframe(explanation_df, width='stretch')
 
-    # Horizontal color-coded SHAP bar chart
+    # SHAP BAR CHART
     fig2, ax2 = plt.subplots()
 
     colors = ["green" if val > 0 else "red" for val in impacts]
