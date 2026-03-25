@@ -102,7 +102,3 @@ News-Article-Classification-Fake-vs-Real/
 - Social media monitoring tools  
 - Fact-checking systems  
 - News verification apps  
-
-## 📌 Note  
-👉 Replace this with your deployed app link:  
-https://your-streamlit-app-link  
